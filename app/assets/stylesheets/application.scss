@@ -14,5 +14,109 @@
  *= require_self
  */
 
-@import "bootstrap-sprockets";
-@import "bootstrap";
+//------------------------------------------------------------------------------
+// Bootstrap
+//------------------------------------------------------------------------------
+@import 'bootstrap-sprockets';
+@import 'bootstrap';
+
+//------------------------------------------------------------------------------
+// Color Pallette 
+//------------------------------------------------------------------------------
+$red-orange: #e8330f;
+$light-blue: #d1f5fc;
+$dark-grey: #222222;
+
+//------------------------------------------------------------------------------
+// External Fonts
+//------------------------------------------------------------------------------
+@import url(http://fonts.googleapis.com/css?family=Lato:400,700,900);
+
+//------------------------------------------------------------------------------
+// Main Laout Styles
+//------------------------------------------------------------------------------
+body {
+  background-color: $dark-grey;
+  font-family: 'Lato', sans-serif;
+}
+
+body > div {
+  padding: 0 !important;
+}
+
+section.white  {
+  background-color: white;
+  padding-bottom: 15px;
+}
+
+section.blue  {
+  background-color: $light-blue;
+  padding-bottom: 25px;
+
+  h2 {
+    font-weight: 900;
+    color: $red-orange;
+  }
+}
+
+section.red-orange {
+  background-color: $red-orange;
+  height: 50px;
+}
+
+footer {
+  background-color: $dark-grey;
+  color: white;
+}
+
+//------------------------------------------------------------------------------
+// Navbar Styles
+//------------------------------------------------------------------------------
+.navbar {
+  border-radius: 0;
+}
+
+.navbar.navbar-inverse {
+  margin-bottom: 0;
+}
+
+.nav-logo {
+  height: 30px;
+  width: 30px;
+  margin-right: 5px;
+}
+
+.navbar-brand {
+  margin-top: -5px;
+}
+
+//------------------------------------------------------------------------------
+// Shout message
+//------------------------------------------------------------------------------
+.shout {
+  font-weight: 900;
+  font-size: 5vw;
+  text-align: center;
+  line-height: 1.5em;
+  margin: 0;
+  padding: 0;
+}
+
+.shout-large {
+  color: $red-orange;
+  font-size: 10vw;
+}
+
+//------------------------------------------------------------------------------
+// Shout message
+//------------------------------------------------------------------------------
+.feature-icon {
+  height: 1.5em;
+  display: inline;
+}
+
+
+footer {
+  padding: 15px;
+}
+
