@@ -23,21 +23,21 @@
 //------------------------------------------------------------------------------
 // Color Pallette 
 //------------------------------------------------------------------------------
-$red-orange: #e8330f;
-$light-blue: #d1f5fc;
 $dark-grey: #222222;
+$light-blue: #d1f5fc;
+$red-orange: #e8330f;
 
 //------------------------------------------------------------------------------
 // External Fonts
 //------------------------------------------------------------------------------
 @import url(http://fonts.googleapis.com/css?family=Lato:400,700,900);
 
-//------------------------------------------------------------------------------
-// Main Laout Styles
+//------------------------------------------------------------------------------u
+// Main Layout Styles
 //------------------------------------------------------------------------------
 body {
-  background-color: $dark-grey;
   font-family: 'Lato', sans-serif;
+  background-color: $dark-grey;
 }
 
 body > div {
@@ -54,8 +54,8 @@ section.blue  {
   padding-bottom: 25px;
 
   h2 {
-    font-weight: 900;
     color: $red-orange;
+    font-weight: 900;
   }
 }
 
@@ -67,6 +67,12 @@ section.red-orange {
 footer {
   background-color: $dark-grey;
   color: white;
+  padding: 15px;
+}
+
+.flash {
+  margin: 0;
+  border-radius: 0;
 }
 
 //------------------------------------------------------------------------------
@@ -82,12 +88,17 @@ footer {
 
 .nav-logo {
   height: 30px;
-  width: 30px;
   margin-right: 5px;
+  width: 30px;
 }
 
 .navbar-brand {
   margin-top: -5px;
+}
+
+.nav-link-btn {
+  text-decoration: none;
+  color: white;
 }
 
 //------------------------------------------------------------------------------
@@ -100,23 +111,21 @@ footer {
   line-height: 1.5em;
   margin: 0;
   padding: 0;
+  
+  .large {
+    color: $red-orange;
+    font-size: 10vw;
+  }
 }
 
-.shout-large {
-  color: $red-orange;
-  font-size: 10vw;
-}
 
 //------------------------------------------------------------------------------
-// Shout message
+// Icons
 //------------------------------------------------------------------------------
 .feature-icon {
-  height: 1.5em;
   display: inline;
+  height: 1.5em;
 }
 
 
-footer {
-  padding: 15px;
-}
 

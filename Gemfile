@@ -9,7 +9,7 @@ group :production do
   gem 'rails_12factor'
 end
 
-group :development do
+group :development, :test  do
   gem 'sqlite3'
 end
 
@@ -50,3 +50,6 @@ end
 # Use Bootstrap
 gem 'bootstrap-sass', '~> 3.2.0'
 gem 'autoprefixer-rails'
+
+# Use devise for authentication
+gem 'devise'

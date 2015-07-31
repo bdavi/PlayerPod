@@ -1,0 +1,68 @@
+  <nav class="navbar navbar-inverse">
+    <!-- Start Inside Nav Container -->
+    <div class="container-fluid">
+
+      <!-- Start Nav Header -->
+      <div class="navbar-header">
+
+        <!-- Start Brand -->
+        <%= link_to home_path, class: 'navbar-brand' do %>
+          <%= image_tag 'player-pod-logo-48x48.png', class: 'nav-logo', alt: 'PlayerPod Logo', description: 'PlayerPod' %>
+          PlayerPod
+        <% end %>
+        <!-- End Brand -->
+        
+        <!-- Start Collapse Button -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#podplayer-navbar-collapse">
+           <span class="sr-only">Toggle navigation</span>
+           <span class="icon-bar"></span>
+           <span class="icon-bar"></span>
+           <span class="icon-bar"></span>
+        </button>
+        <!-- Start Collapse Button -->
+
+      </div>
+      <!-- End Nav Header -->
+
+      <!-- Start Menu Content (Collapses) -->
+      <div class="collapse navbar-collapse" id="podplayer-navbar-collapse">
+        <div class='navbar-right'>
+          <ul class="nav navbar-nav">
+            <% if user_signed_in? %>
+              <li>
+                <p class="navbar-text">Happy listening, <%= current_user.email %></p>
+              </li>
+              <li>
+                <div class="btn btn-primary navbar-btn">
+                  <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link-btn" %>
+                </div>
+              </li>
+            <% else %>
+              <li>
+                <%= form_for :user, url: session_path(:user), html: {class: "navbar-form"} do |f| %>
+                  <div class="form-group">
+                    <%= f.email_field :email, autofocus: true, placeholder: "Email", class: "form-control" %>
+                  </div>
+
+                  <div class="form-group">
+                    <%= f.password_field :password, autocomplete: "off", placeholder: "Password", class: "form-control" %>
+                  </div>
+
+                  <%= f.submit "Sign in", class: "btn btn-success" %>
+                <% end %>
+              </li>
+              <li>
+                <div class="btn btn-primary navbar-btn">
+                  <%= link_to "Register", new_user_registration_path, class: "nav-link-btn" %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+      <!-- End Menu Content (Collapses) -->
+    </div> 
+    <!-- End Inside Nav Container --> 
+  </nav>
+
+

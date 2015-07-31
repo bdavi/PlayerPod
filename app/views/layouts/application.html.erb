@@ -14,12 +14,10 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <!-- External Fonts -->
-  <link href='http://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
-
   <!-- Asset Pipeline -->
   <%= stylesheet_link_tag 'application', media: 'all' %>
   <%= javascript_include_tag 'application' %>
+
   <%= csrf_meta_tags %>
 
 </head>
@@ -27,73 +25,17 @@
 <!-- Start Content -->
 <div class='container-fluid content-wrapper'>
 
-<!-- Start Navigation Bar -->
-<nav class="navbar navbar-inverse">
-  <!-- Start Inside Nav Container -->
-  <div class="container-fluid">
+  <!-- Insert Flash Messages -->
+  <%= render "layouts/flash_messages" %>
 
-    <!-- Start Nav Header -->
-    <div class="navbar-header">
+  <!-- Insert Navigation Bar -->
+  <%= render "layouts/nav_menu" %>
 
-      <!-- Start Brand -->
-      <%= link_to home_path, class: 'navbar-brand' do %>
-        <%= image_tag 'player-pod-logo-48x48.png', class: 'nav-logo', alt: 'PlayerPod Logo', description: 'PlayerPod' %>
-        PlayerPod
-      <% end %>
-      <!-- End Brand -->
-      
-      <!-- Start Collapse Button -->
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#podplayer-navbar-collapse">
-         <span class="sr-only">Toggle navigation</span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-         <span class="icon-bar"></span>
-      </button>
-      <!-- Start Collapse Button -->
-
-    </div>
-    <!-- End Nav Header -->
-
-    <!-- Start Menu Content (Collapses) -->
-    <div class="collapse navbar-collapse" id="podplayer-navbar-collapse">
-      <div class='navbar-right'>
-      <ul class="nav navbar-nav">
-      <li>
-      <form class="navbar-form">
-        <div class="form-group">
-          <input type="text" placeholder="Email" class="form-control">
-        </div>
-        <div class="form-group">
-          <input type="password" placeholder="Password" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-success">Sign in</button>
-      </form>
-      </li>
-      <li>
-      <button type="submit" class="btn btn-primary navbar-btn">Sign up</button>
-      </li>
-    </div>
-    </div>
-    <!-- End Menu Content (Collapses) -->
-
-  </div> 
-  <!-- End Inside Nav Container --> 
-
-
-
-
-
-</nav>
-<!-- End Navigation Bar -->
-
-
-
-
-
-
-
+  <!-- View content -->
   <%= yield %>
-</div> <!-- End Content -->
+  
+</div> 
+<!-- End Content -->
 
   <!-- Begin Footer --> 
 <footer class='container-fluid'>
