@@ -56,3 +56,6 @@ gem 'devise'
 
 # Use pundit for authorization
 gem 'pundit'
+
+# Use figaro to handle sensitive info
+gem 'figaro', '1.0'
