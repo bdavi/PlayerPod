@@ -44,6 +44,10 @@ body > div {
   padding: 0 !important;
 }
 
+.content-wrapper {
+  background-color: white;
+}
+
 section.white  {
   background-color: white;
   padding-bottom: 15px;
@@ -96,7 +100,12 @@ footer {
   margin-top: -5px;
 }
 
-.nav-link-btn {
+.nav-link-btn, 
+.nav-link-btn:visited, 
+.nav-link-btn:active, 
+.nav-link-btn:link, 
+.nav-link-btn:hover
+{
   text-decoration: none;
   color: white;
 }
@@ -117,7 +126,6 @@ footer {
     font-size: 10vw;
   }
 }
-
 
 //------------------------------------------------------------------------------
 // Icons
