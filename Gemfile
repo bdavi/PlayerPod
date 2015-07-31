@@ -53,3 +53,6 @@ gem 'autoprefixer-rails'
 
 # Use devise for authentication
 gem 'devise'
+
+# Use pundit for authorization
+gem 'pundit'
