@@ -50,7 +50,7 @@ body > div {
 
 section.white  {
   background-color: white;
-  padding-bottom: 15px;
+  padding: 15px;
 }
 
 section.blue  {
@@ -77,6 +77,15 @@ footer {
 .flash {
   margin: 0;
   border-radius: 0;
+}
+
+.center-col {
+  max-width: 800px;
+  margin: auto;
+}
+
+h1 .btn {
+  margin: 0 0 5px 0;
 }
 
 //------------------------------------------------------------------------------
@@ -112,6 +121,7 @@ footer {
   
 .navbar-collapse {
   overflow-x: hidden;
+  padding-left: 25px;
 }
 
 //------------------------------------------------------------------------------

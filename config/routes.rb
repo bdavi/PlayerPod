@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :subscriptions
+
   devise_for :users
   get 'about' => 'static_pages#about'
   get 'home' => 'static_pages#home'
