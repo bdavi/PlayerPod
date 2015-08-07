@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  resources :subscriptions
+  resources :subscriptions, only: [:index, :create, :destroy]
 
   devise_for :users
   get 'about' => 'static_pages#about'

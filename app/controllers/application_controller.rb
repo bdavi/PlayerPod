@@ -13,4 +13,9 @@ class ApplicationController < ActionController::Base
     flash[:alert] = "You are not authorized to view this page."
     redirect_to root_path
   end
+
+  # Set default home page after signing in
+  def after_sign_in_path_for(resource)
+    subscriptions_path
+  end
 end
