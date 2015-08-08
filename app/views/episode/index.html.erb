@@ -1,0 +1,14 @@
+<section class='white'>
+  <div class='center-col'>
+    <h1>Your Episodes</h1>
+
+    <% @episodes.each do |episode| %>
+      <%= content_tag :h3, episode.title %>
+      <%= content_tag :p, "Published #{episode.display_pub_date} on #{episode.feed.title}" %>
+      <audio controls>
+        <source src="<%= episode.audio_url %>" type="audio/mpeg">
+        Your browser does not support the audio tag.
+      </audio>
+    <% end %>
+  </div>
+</section>
