@@ -1,13 +1,18 @@
 <section class='white'>
   <div class='center-col'>
-    <h1>
-      Your Subscriptions
-      <%= link_to new_subscription_path, class: "btn btn-primary" do %>
-        <span class="glyphicon glyphicon-plus-sign"> </span> &nbsp;Add New
-      <% end %>
-    </h1>
+    <h1>Your Subscriptions</h1>
+
+    <div class="form-group">
+      <%= form_tag subscriptions_path, method: :post, class: "form-inline" do %>
+        <%= text_field_tag :feed_url, "", class: "form-control", placeholder: "Feed URL" %>
+        <%= submit_tag "Add New!", class: "btn btn-success" %>
+      <% end %> 
+    </div>
+
     <% @subscriptions.each do |s| %>
-      <p><%= s.feed.feed_url %></p>
+      <%= content_tag :h3, s.feed.title %>
+      <%= content_tag :p, s.feed.description %>
+      <%= link_to "Unsubscribe", subscription_path(s.id), method: :delete %>
     <% end %>
   </div>
 </section>

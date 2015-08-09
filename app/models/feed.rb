@@ -1,70 +1,73 @@
 require 'uri'
 
 class Feed < ActiveRecord::Base
-  URL_REGEX = /\A#{URI::regexp}\Z/
+  has_many :subscriptions, dependent: :destroy
+  has_many :episodes, dependent: :destroy
+  before_validation :ensure_url_contains_a_podcast_feed, before: :create
+  after_create :update_from_server
 
-  attr_accessor :xml, :xml_hash
+  def ensure_url_contains_a_podcast_feed
+    begin
+      feed_xml = get_content_from_url #Will error if invalid URL or network problems
+      feed_hash = Hash.from_xml(feed_xml) #Will error if not valid XML
+      return feed_hash_is_well_formed(feed_hash)
+    rescue
+      errors.add :feed_url, "This URL doesn't contain a valid podcast feed."
+      return false 
+    end
+  end
 
-  @xml= ""
-  @xml_hash = {}
+  def get_content_from_url
+    Net::HTTP.get(URI.parse(feed_url))
+  end
 
-  has_many :subscriptions
-  has_many :episodes
-  validates_format_of :feed_url, with: URL_REGEX
+  # Checks hash to ensure it has all the elements we will need to parse this as a podcast feed.
+  def feed_hash_is_well_formed(feed_hash)
+    begin
+      return feed_hash["rss"]["channel"].has_key?("title") \
+          && feed_hash["rss"]["channel"].has_key?("description") \
+          && feed_hash["rss"]["channel"].has_key?("item") 
+    rescue 
+      false
+    end
+  end
 
   def update_from_server
-    get_feed_xml
-    store_channel_info
-    remove_missing_episodes
-    create_new_episodes
-    self.save
-  end
+    begin
+      feed_xml = get_content_from_url
+      feed_hash = Hash.from_xml(feed_xml)
 
-  def get_feed_xml
-    @xml = Net::HTTP.get(URI.parse(feed_url))
-    @xml_hash = Hash.from_xml(@xml)
-  end
+      ActiveRecord::Base.transaction do
+        channel_data = feed_hash["rss"]["channel"]
+    
+        # Update feed
+        self.title = channel_data["title"]
+        self.description = channel_data["description"]
+        self.save
 
-  def store_channel_info
-    channel_data = @xml_hash["rss"]["channel"]
-    self.title = channel_data["title"]
-    self.description = channel_data["description"]
-  end
+        # Clear old episodes
+        episode_guids_to_keep = channel_data["item"].map {|item| item["guid"]}
+        self.episodes.where.not(guid: episode_guids_to_keep).destroy_all
 
-  def remove_missing_episodes
-    # Determine what episodes are in the feed we downloaded
-    episode_guids_to_keep = []
-    @xml_hash["rss"]["channel"]["item"].each do |item|
-      episode_guids_to_keep << item["guid"]
-    end
-
-    # Remove local/old episodes if they are no longer in the feed
-    self.episodes.each do |episode|
-      episode.destroy unless episode_guids_to_keep.include? episode.guid
-    end
-  end
-
-  def create_new_episodes
-    # Determine what episodes we already have
-    currently_saved_episode_guids = []
-    self.episodes.each do |episode|
-      currently_saved_episode_guids << episode.guid
-    end
-
-    # Create missing episodes
-    @xml_hash["rss"]["channel"]["item"].each do |item|
-      if not currently_saved_episode_guids.include? item["guid"]
-        self.episodes.create(
-            title: item["title"],
-            link: item["link"],
-            description: item["description"],
-            pubDate: item["pubDate"],
-            duration: item["link"],
-            audio_url: item["content"]["url"],
-            guid: item["guid"])
+        # Create new episodes
+        existing_episode_guids = self.episodes.map {|e| e.guid}
+        channel_data["item"].each do |item|
+          unless existing_episode_guids.include? item["guid"]
+            self.episodes.create(
+                title: item["title"],
+                link: item["link"],
+                description: item["description"],
+                pubDate: item["pubDate"],
+                duration: item["link"],
+                audio_url: item["content"]["url"],
+                guid: item["guid"])
+          end
+        end
       end
+      return true
+    rescue
+      return false
     end
   end
-
-private
 end
+
