@@ -5,6 +5,7 @@
     <% @episodes.each do |episode| %>
       <%= content_tag :h3, episode.title %>
       <%= content_tag :p, "Published #{episode.display_pub_date} on #{episode.feed.title}" %>
+      <%= content_tag :p, sanitize_for_display(episode.description).html_safe %>
       <audio controls>
         <source src="<%= episode.audio_url %>" type="audio/mpeg">
         Your browser does not support the audio tag.

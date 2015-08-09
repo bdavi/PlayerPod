@@ -4,9 +4,17 @@ class SubscriptionsController < ApplicationController
   end
   
   def create
-    # Get or Create and Validate feed based on passed url
-    feed = Feed.where(feed_url: params[:feed_url]).first \
-           || Feed.create(feed_url: params[:feed_url])
+    # Use http if no protocol provided or if "feed://" protocol provided. 
+    # Needed for URI parse and to be sure we don't end up with two feeds for the 
+    # same podcast (one with and one without the protocol)
+    cleaned_feed_url = params[:feed_url].gsub("feed://", "")
+    cleaned_feed_url = cleaned_feed_url =~ /^http(s)?:\/\/.+/ \
+                     ? cleaned_feed_url \
+                     : "http://#{cleaned_feed_url}"
+                       
+    # Get or create feed based on passed url
+    feed = Feed.where(feed_url: cleaned_feed_url).first \
+           || Feed.create(feed_url: cleaned_feed_url)
 
     # Handle invalid feed
     if feed.invalid?

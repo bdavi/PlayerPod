@@ -149,5 +149,26 @@ h1 .btn {
   height: 1.5em;
 }
 
+//------------------------------------------------------------------------------
+// Processing overlay
+//------------------------------------------------------------------------------
 
+.translucent-overlay {
+  background-color: rgba(255, 255, 255, .5);
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 500;
+}
 
+.processing_circle {
+  display: none;
+  left: 50%;
+  margin: -16px 0 0 -16px;
+  position: fixed;
+  top: 50%;
+  z-index: 501;
+}
