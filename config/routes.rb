@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  get 'episode/index'
+
   resources :subscriptions, only: [:index, :create, :destroy]
 
   devise_for :users
