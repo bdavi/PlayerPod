@@ -1,0 +1,13 @@
+<section class='white'>
+  <div class='center-col'>
+    <h1>
+      Your Subscriptions
+      <%= link_to new_subscription_path, class: "btn btn-primary" do %>
+        <span class="glyphicon glyphicon-plus-sign"> </span> &nbsp;Add New
+      <% end %>
+    </h1>
+    <% @subscriptions.each do |s| %>
+      <p><%= s.feed.feed_url %></p>
+    <% end %>
+  </div>
+</section>

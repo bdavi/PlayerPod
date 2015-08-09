@@ -26,6 +26,14 @@
 
       <!-- Start Menu Content (Collapses) -->
       <div class="collapse navbar-collapse" id="podplayer-navbar-collapse">
+        <div class='nav navbar-nav'>
+          <ul class='nav navbar-nav'>
+            <li>
+              <%= link_to "Subscriptions", subscriptions_path %>
+            </li>
+          </ul>
+        </div>
+
         <div class='navbar-right'>
           <ul class="nav navbar-nav">
             <% if user_signed_in? %>
@@ -60,6 +68,7 @@
           </ul>
         </div>
       </div>
+
       <!-- End Menu Content (Collapses) -->
     </div> 
     <!-- End Inside Nav Container --> 

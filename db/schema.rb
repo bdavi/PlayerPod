@@ -11,7 +11,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150731012206) do
+ActiveRecord::Schema.define(version: 20150804015058) do
+
+  create_table "episodes", force: :cascade do |t|
+    t.string   "title"
+    t.string   "link"
+    t.string   "description"
+    t.datetime "pubDate"
+    t.string   "duration"
+    t.string   "audio_url"
+    t.string   "guid"
+    t.integer  "feed_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "episodes", ["feed_id"], name: "index_episodes_on_feed_id"
 
   create_table "feeds", force: :cascade do |t|
     t.string   "feed_url"
