@@ -1,6 +1,5 @@
 require 'uri'
 require 'net/http'
-require 'htmlentities'
 
 class Feed < ActiveRecord::Base
   has_many :subscriptions, dependent: :destroy
@@ -10,10 +9,9 @@ class Feed < ActiveRecord::Base
 
   def update_from_server
     begin
-      # Get and hash (and decode if necessary) the feed info
-      # feed_xml = HTMLEntities.new.decode(get_content_from_url) #Will error if invalid URL or network problems
+      # Get and hash the feed info
       feed_xml = get_content_from_url #Will error if invalid URL or network problems
-      feed_hash = convert_to_hash(feed_xml)
+      feed_hash = Hash.from_xml(feed_xml) #Will error if not valid XML
       channel_data = feed_hash["rss"]["channel"]
 
       ActiveRecord::Base.transaction do
@@ -52,10 +50,10 @@ private
 
   def ensure_url_contains_a_podcast_feed
     begin
-      # Get and hash (and decode if necessary) the feed info
+      # Get and hash the feed info
       # feed_xml = HTMLEntities.new.decode(get_content_from_url) #Will error if invalid URL or network problems
       feed_xml = get_content_from_url
-      feed_hash = convert_to_hash(feed_xml) #Will error if not valid XML
+      feed_hash = Hash.from_xml(feed_xml) #Will error if not valid XML
       return feed_hash_is_well_formed(feed_hash)
     rescue
       errors.add :feed_url, "This URL doesn't contain a valid podcast feed."
@@ -68,18 +66,6 @@ private
     uri = URI(feed_url)
     response = Net::HTTP.get_response(uri)
     response.body
-  end
-
-  # Converts downloaded feed xml to a hash. Decodes if necessary
-  def convert_to_hash(feed_xml)
-    begin
-      feed_hash = Hash.from_xml(feed_xml)
-    rescue
-      # We may just have an encoding error so let's try to decode it.
-      # This may still throw an error which needs to be caught by the calling method.
-      feed_hash = Hash.from_xml(HTMLEntities.new.decode(feed_xml))
-    end
-    feed_hash
   end
 
   # Checks hash to ensure it has all the elements we will need to parse this as a podcast feed.

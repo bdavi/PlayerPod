@@ -1,15 +1,36 @@
 <section class='white'>
   <div class='center-col'>
-    <h1>Your Episodes</h1>
+    <!-- <h1>Your Episodes</h1> -->
 
-    <% @episodes.each do |episode| %>
-      <%= content_tag :h3, episode.title %>
-      <%= content_tag :p, "Published #{episode.display_pub_date} on #{episode.feed.title}" %>
-      <%= content_tag :p, sanitize_for_display(episode.description).html_safe %>
-      <audio controls>
-        <source src="<%= episode.audio_url %>" type="audio/mpeg">
-        Your browser does not support the audio tag.
+    <div class="audio-player">
+
+      <!-- <audio controls style="width: 100%;"> -->
+      <audio>
+        <source src="<%= @episodes.first.audio_url %>" type="<%= @episodes.first.audio_type %>">
       </audio>
+
+      <div class="play-pause-button player-button">
+        <%= image_tag 'appbar.control.play.svg', alt: 'Play/Pause' %>
+      </div>
+      <div class="current-track"><%= @episodes.first.title %></div>
+      <div class="previous-button player-button">
+        <%= image_tag 'appbar.chevron.left.svg', alt: 'Previous' %>
+      </div>
+      <div class="next-button player-button">
+        <%= image_tag 'appbar.chevron.right.svg', alt: 'Next' %>
+      </div>
+    </div>
+
+    <% @episodes.each_with_index do |episode, index| %>
+      <%= content_tag :div, class: 'episode', data: {
+        "episode-index" => index, "episode-audio-url" => episode.audio_url,
+        "episode-id" => episode.id, "episode-audio-type" => episode.audio_type,
+        "episode-title" => episode.title } do %>
+
+        <%= content_tag :h3, episode.title %>
+        <%= content_tag :p, "Published #{episode.display_pub_date} on #{episode.feed.title}" %>
+        <%= content_tag :p, sanitize_for_display(episode.description).html_safe %>
+      <% end %>
     <% end %>
   </div>
 </section>
