@@ -1,6 +1,6 @@
 class SubscriptionsController < ApplicationController
   def index
-    @subscriptions = current_user.subscriptions
+    @subscriptions = current_user.subscriptions.includes(:feed).order("feeds.title")
   end
   
   def create

@@ -1,0 +1,77 @@
+// *****************************************************************************
+// Declarations
+// *****************************************************************************
+var playImagePath = "<%= asset_path 'appbar.control.play.svg' %>";
+var pauseImagePath = "<%= asset_path 'appbar.control.pause.svg' %>";
+var currentEpisodeID = 0; // We're 0 indexed here everybody
+var isPlaying = false;
+var $audioTag; 
+
+// *****************************************************************************
+// Initialize
+// *****************************************************************************
+function initEventHandlers() {
+  $(".play-pause-button").click(togglePlayPause);
+  $(".next-button").click(nextTrack);
+  $(".previous-button").click(previousTrack);
+  $("audio").bind("ended", nextTrack);
+}
+
+// *****************************************************************************
+// Helpers
+// *****************************************************************************
+function togglePlayPause() {
+  if (isPlaying) {
+    $(".play-pause-button img").attr("src", playImagePath);
+    $audioTag.pause();
+    isPlaying = false;
+  } else {
+    $(".play-pause-button img").attr("src", pauseImagePath);
+    $audioTag.play();
+    isPlaying = true;
+  }
+}
+
+function nextTrack() {
+  var $nextEpisode = getEpisodeByIndex(currentEpisodeID + 1);
+  if ($nextEpisode.length) {
+    setPlayingTrack($nextEpisode);
+    currentEpisodeID++;
+  }
+}
+
+function previousTrack() {
+  var $previousEpisode = getEpisodeByIndex(currentEpisodeID - 1);
+  if ($previousEpisode.length) {
+    setPlayingTrack($previousEpisode);
+    currentEpisodeID--;
+  }
+}
+
+// Return undefined if not found
+function getEpisodeByIndex(index) {
+  return $('.episode[data-episode-index="' + index + '"]');
+}
+
+function setPlayingTrack(episode) {
+  var title = episode.attr("data-episode-title");
+  var type = episode.attr("data-episode-audio-type");
+  var url = episode.attr("data-episode-audio-url");
+  
+  $(".current-track").html(title);
+  $("source").attr("src", url);
+  $("source").attr("type", type);
+  $audioTag.load();
+  if (isPlaying) {
+    $audioTag.play();
+  }
+}
+
+// *****************************************************************************
+// Document Ready / Load
+// *****************************************************************************
+$("document").ready(function() {
+  $audioTag = $("audio")[0];
+  initEventHandlers();
+});
+
