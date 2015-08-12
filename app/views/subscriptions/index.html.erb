@@ -5,7 +5,7 @@
     <div class="form-group">
       <%= form_tag subscriptions_path, method: :post, class: "form-inline" do %>
         <%= text_field_tag :feed_url, "", class: "form-control", placeholder: "Feed URL" %>
-        <%= submit_tag "Add New!", class: "btn btn-success" %>
+        <%= submit_tag "Add New!", class: "btn btn-success show-processing" %>
       <% end %> 
     </div>
 
@@ -16,3 +16,8 @@
     <% end %>
   </div>
 </section>
+
+<!-- These two element are used to grey out the screen and show a processing
+image when a user adds a podcast and is waiting for it to be parsed -->
+<div class='translucent-overlay show-when-processing'>&nbsp;</div>
+<%= image_tag 'processing_circle.gif', class: 'processing_circle show-when-processing', alt: 'processing' %>
