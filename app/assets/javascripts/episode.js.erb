@@ -3,75 +3,139 @@
 // *****************************************************************************
 var playImagePath = "<%= asset_path 'appbar.control.play.svg' %>";
 var pauseImagePath = "<%= asset_path 'appbar.control.pause.svg' %>";
-var currentEpisodeID = 0; // We're 0 indexed here everybody
+var smallPlayImagePath = "<%= asset_path 'appbarControlPlayOrange.svg' %>";
+var smallPauseImagePath = "<%= asset_path 'appbarControlPauseOrange.svg' %>";
+var currentEpisodeIndex = 0; // We're 0 indexed here everybody
 var isPlaying = false;
 var $audioTag; 
+var maxEpisodeIndex;
 
 // *****************************************************************************
-// Initialize
+// Event Handlers
 // *****************************************************************************
-function initEventHandlers() {
-  $(".play-pause-button").click(togglePlayPause);
-  $(".next-button").click(nextTrack);
-  $(".previous-button").click(previousTrack);
-  $("audio").bind("ended", nextTrack);
+function togglePlayPause() {
+  isPlaying = !isPlaying;
+  refreshAll();
+}
+
+function playNextEpisode() {
+  if (currentEpisodeIndex < maxEpisodeIndex) {
+    currentEpisodeIndex++;
+    refreshAll();
+  }
+}
+
+function playPreviousEpisode() {
+  if (currentEpisodeIndex > 0) {
+    currentEpisodeIndex--;
+    refreshAll();
+  }
+}
+
+function togglePlaySelectedEpisode() {
+  var newEpisodeIndex = $(event.target).attr('id');
+
+  // Play new track
+  if (newEpisodeIndex !== currentEpisodeIndex) {
+    currentEpisodeIndex = newEpisodeIndex;
+    isPlaying = true;
+  }
+  else { // or pause current track
+    isPlaying = !isPlaying;
+  }
+  refreshAll();
 }
 
 // *****************************************************************************
 // Helpers
 // *****************************************************************************
-function togglePlayPause() {
-  if (isPlaying) {
-    $(".play-pause-button img").attr("src", playImagePath);
-    $audioTag.pause();
-    isPlaying = false;
-  } else {
-    $(".play-pause-button img").attr("src", pauseImagePath);
-    $audioTag.play();
-    isPlaying = true;
-  }
-}
-
-function nextTrack() {
-  var $nextEpisode = getEpisodeByIndex(currentEpisodeID + 1);
-  if ($nextEpisode.length) {
-    setPlayingTrack($nextEpisode);
-    currentEpisodeID++;
-  }
-}
-
-function previousTrack() {
-  var $previousEpisode = getEpisodeByIndex(currentEpisodeID - 1);
-  if ($previousEpisode.length) {
-    setPlayingTrack($previousEpisode);
-    currentEpisodeID--;
-  }
-}
-
-// Return undefined if not found
-function getEpisodeByIndex(index) {
-  return $('.episode[data-episode-index="' + index + '"]');
-}
-
-function setPlayingTrack(episode) {
-  var title = episode.attr("data-episode-title");
-  var type = episode.attr("data-episode-audio-type");
-  var url = episode.attr("data-episode-audio-url");
+function refreshDisplay() {
+  currentEpisode = new Episode(currentEpisodeIndex);
   
-  $(".current-track").html(title);
-  $("source").attr("src", url);
-  $("source").attr("type", type);
-  $audioTag.load();
+  $(".current-track").html(currentEpisode.title);
+  $('.episode img[id]').attr("src", smallPlayImagePath);
+  
+  if (isPlaying) {
+    $(".play-pause-button img").attr("src", pauseImagePath);    
+    $('.episode img[id="' + currentEpisodeIndex + '"]').attr("src", smallPauseImagePath);
+  }
+  else {
+    $(".play-pause-button img").attr("src", playImagePath);    
+  }
+}
+
+function refreshAudioTag() {
+  currentEpisode = new Episode(currentEpisodeIndex);
+
+  // Only update if the audio player isn't already set up for this episode
+  if ($("source").attr("src") !== currentEpisode.audioUrl) {
+    $("source").attr("src", currentEpisode.audioUrl);
+    $("source").attr("type", currentEpisode.audioType);
+    $audioTag.load();
+  }
+
   if (isPlaying) {
     $audioTag.play();
   }
+  else {
+    $audioTag.pause();
+  }
+}
+
+function refreshAll() {
+  refreshDisplay();
+  refreshAudioTag();
 }
 
 // *****************************************************************************
-// Document Ready / Load
+// Episode Prototype 
+// *****************************************************************************
+function Episode(index) {
+  this.index = index;
+  this.$episodeDiv = $('.episode[data-episode-index="' + index + '"]');
+  this.audioUrl = this.$episodeDiv.attr("data-episode-audio-url");
+  this.audioType = this.$episodeDiv.attr("data-episode-type");
+  this.title = this.$episodeDiv.attr("data-episode-title")
+}
+
+// *****************************************************************************
+// Document Ready / Initialize
 // *****************************************************************************
 $("document").ready(function() {
   $audioTag = $("audio")[0];
+  maxEpisodeIndex = getMaxEpisodeIndex();
   initEventHandlers();
 });
+
+function initEventHandlers() {
+  $(".play-pause-button").click(togglePlayPause);
+  $(".next-button").click(playNextEpisode);
+  $(".previous-button").click(playPreviousEpisode);
+  $("audio").bind("ended", playNextEpisode);
+  $(".episode img[id]").click(togglePlaySelectedEpisode);
+}
+
+function getMaxEpisodeIndex() {
+  var maxIndex = 0;
+  $('.episode').each(function() {
+    var thisIndex = parseInt($(this).attr('data-episode-index'));
+    // alert(thisIndex);
+    maxIndex = Math.max(thisIndex, maxIndex);
+  });
+  return maxIndex;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
