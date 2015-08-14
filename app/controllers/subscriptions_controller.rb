@@ -1,9 +1,13 @@
 class SubscriptionsController < ApplicationController
+
   def index
-    @subscriptions = current_user.subscriptions.includes(:feed).order("feeds.title")
+    raise Pundit::NotAuthorizedError unless current_user
+    @subscriptions = Subscription.visible_to(current_user).includes(:feed).order("feeds.title")
   end
   
   def create
+    raise Pundit::NotAuthorizedError unless current_user
+
     # Use http if no protocol provided or if "feed://" protocol provided. 
     # Needed for URI parse and to be sure we don't end up with two feeds for the 
     # same podcast (one with and one without the protocol)
@@ -38,6 +42,7 @@ class SubscriptionsController < ApplicationController
 
   def destroy
     @subscription = Subscription.find(params[:id])
+    authorize @subscription
     @title = @subscription.feed.title
     if @subscription.destroy
       flash[:alert] = "Unsubscribed from #{@title}."

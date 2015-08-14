@@ -115,8 +115,8 @@ h1 .btn {
 .nav-link-btn:link, 
 .nav-link-btn:hover
 {
-  text-decoration: none;
   color: white;
+  text-decoration: none;
 }
   
 .navbar-collapse {
@@ -173,24 +173,16 @@ h1 .btn {
 }
 
 //------------------------------------------------------------------------------
-// Episode
-//------------------------------------------------------------------------------
-// .episode img {
-//   height: 1em;
-// }
-
-//------------------------------------------------------------------------------
 // Audio Player
 //------------------------------------------------------------------------------
 .audio-player {
   background-color: $red-orange;
+  bottom: 0px;
   height: 75px;
+  left: 0;
   position: fixed;
   width: 100%;
   min-width: 225px;
-
-  bottom: 0px;
-  left: 0;
 
   > div {
     height: 100%;
@@ -219,17 +211,17 @@ h1 .btn {
   }
 
   .current-track {
+    color: white;
+    font-size: 1.6em;
+    font-weight: 600;
+    height: 1.8em;
+    left: 75px;
+    line-height: 1.8em;
+    margin-right: 150px;
     margin-top: 18px;
     overflow: hidden;
     position: absolute;
     top: 0;
-    left: 75px;
-    margin-right: 150px;
-    line-height: 1.8em;
-    height: 1.8em;
-    color: white;
-    font-weight: 600;
-    font-size: 1.6em;
   }
 
   @media (max-width: 450px) {
@@ -238,10 +230,3 @@ h1 .btn {
     }
   }
 }
-
-
-
-
-
-
-
