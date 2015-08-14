@@ -26,6 +26,7 @@
 
       <!-- Start Menu Content (Collapses) -->
       <div class="collapse navbar-collapse" id="podplayer-navbar-collapse">
+        <!-- Start Signed in user: Episode/Subscription link  -->
         <% if user_signed_in? %>
           <div class='nav navbar-nav'>
             <ul class='nav navbar-nav'>
@@ -33,15 +34,18 @@
                 <%= link_to "Subscriptions", subscriptions_path %>
               </li>
               <li>
-                <%= link_to "Episodes", episode_index_path %>
+                <%= link_to "Episodes", episodes_path %>
               </li>              
             </ul>
           </div>
         <% end %>
+        <!-- End Signed in user: Episode/Subscription link  -->
 
         <div class='navbar-right'>
           <ul class="nav navbar-nav">
             <% if user_signed_in? %>
+              
+              <!-- Start Signed in user: greeting and logout button  -->
               <li>
                 <p class="navbar-text">Happy listening, <%= current_user.email %></p>
               </li>
@@ -50,7 +54,11 @@
                   <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "nav-link-btn" %>
                 </div>
               </li>
+              <!-- End Signed in user: greeting and logout button  -->
+            
             <% else %>
+              
+              <!-- Start No User: Sign in/up links -->
               <li>
                 <%= form_for :user, url: session_path(:user), html: {class: "navbar-form"} do |f| %>
                   <div class="form-group">
@@ -69,6 +77,8 @@
                   <%= link_to "Register", new_user_registration_path, class: "nav-link-btn" %>
                 </div>
               </li>
+              <!-- Start No User: Sign in/up links -->
+
             <% end %>
           </ul>
         </div>

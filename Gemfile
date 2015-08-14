@@ -59,6 +59,3 @@ gem 'pundit'
 
 # Use figaro to handle sensitive info
 gem 'figaro', '1.0'
-
-# Use HTMLEntities for encoding / decoding HTML/XML
-gem 'htmlentities'
