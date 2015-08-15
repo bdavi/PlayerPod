@@ -15,24 +15,24 @@ var maxEpisodeIndex;
 // *****************************************************************************
 function togglePlayPause() {
   isPlaying = !isPlaying;
-  refreshAll();
+  updateAll();
 }
 
 function playNextEpisode() {
   if (currentEpisodeIndex < maxEpisodeIndex) {
     currentEpisodeIndex++;
-    refreshAll();
+    updateAll();
   }
 }
 
 function playPreviousEpisode() {
   if (currentEpisodeIndex > 0) {
     currentEpisodeIndex--;
-    refreshAll();
+    updateAll();
   }
 }
 
-function togglePlaySelectedEpisode() {
+function togglePlaySelectedEpisode(event) {
   var newEpisodeIndex = $(event.target).attr('id');
 
   // Play new track
@@ -43,28 +43,28 @@ function togglePlaySelectedEpisode() {
   else { // or pause current track
     isPlaying = !isPlaying;
   }
-  refreshAll();
+  updateAll();
 }
 
 // *****************************************************************************
 // Helpers
 // *****************************************************************************
-function refreshDisplay() {
+function updateDisplay() {
   currentEpisode = new Episode(currentEpisodeIndex);
   
   $(".current-track").html(currentEpisode.title);
   $('.episode img[id]').attr("src", smallPlayImagePath);
   
   if (isPlaying) {
-    $(".play-pause-button img").attr("src", pauseImagePath);    
+    $(".play-pause-button img").attr("src", pauseImagePath);
     $('.episode img[id="' + currentEpisodeIndex + '"]').attr("src", smallPauseImagePath);
   }
   else {
-    $(".play-pause-button img").attr("src", playImagePath);    
+    $(".play-pause-button img").attr("src", playImagePath);
   }
 }
 
-function refreshAudioTag() {
+function updateAudioTag() {
   currentEpisode = new Episode(currentEpisodeIndex);
 
   // Only update if the audio player isn't already set up for this episode
@@ -72,6 +72,7 @@ function refreshAudioTag() {
     $("source").attr("src", currentEpisode.audioUrl);
     $("source").attr("type", currentEpisode.audioType);
     $audioTag.load();
+    displayLoadingSpinner(); // Callback from audio will hide when done loading
   }
 
   if (isPlaying) {
@@ -82,9 +83,17 @@ function refreshAudioTag() {
   }
 }
 
-function refreshAll() {
-  refreshDisplay();
-  refreshAudioTag();
+function updateAll() {
+  updateDisplay();
+  updateAudioTag();
+}
+
+function displayLoadingSpinner() {
+  $('.show-when-processing').css('display', 'block');
+}
+
+function hideLoadingSpinner() {
+  $('.show-when-processing').css('display', 'none');
 }
 
 // *****************************************************************************
@@ -113,6 +122,7 @@ function initEventHandlers() {
   $(".previous-button").click(playPreviousEpisode);
   $("audio").bind("ended", playNextEpisode);
   $(".episode img[id]").click(togglePlaySelectedEpisode);
+  $("audio").bind("canplay", hideLoadingSpinner);
 }
 
 function getMaxEpisodeIndex() {
@@ -124,18 +134,3 @@ function getMaxEpisodeIndex() {
   });
   return maxIndex;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
