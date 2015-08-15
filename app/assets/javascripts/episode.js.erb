@@ -129,7 +129,6 @@ function getMaxEpisodeIndex() {
   var maxIndex = 0;
   $('.episode').each(function() {
     var thisIndex = parseInt($(this).attr('data-episode-index'));
-    // alert(thisIndex);
     maxIndex = Math.max(thisIndex, maxIndex);
   });
   return maxIndex;
