@@ -8,4 +8,5 @@ class User < ActiveRecord::Base
   has_many :subscriptions
   has_many :feeds, through: :subscriptions
   has_many :episodes, through: :feeds
+  has_many :episode_plays
 end

@@ -11,7 +11,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150809163009) do
+ActiveRecord::Schema.define(version: 20150815001310) do
+
+  create_table "episode_plays", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "episode_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "episode_plays", ["episode_id"], name: "index_episode_plays_on_episode_id"
+  add_index "episode_plays", ["user_id"], name: "index_episode_plays_on_user_id"
 
   create_table "episodes", force: :cascade do |t|
     t.string   "title"

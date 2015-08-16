@@ -1,5 +1,6 @@
 class Episode < ActiveRecord::Base
   belongs_to :feed
+  has_many :episode_plays
 
   def feed
     Feed.find(self.feed_id)

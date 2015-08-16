@@ -2,7 +2,7 @@
   <% flash.each do |type, message| %>
       <%= content_tag :div, class: "alert alert-#{get_bootstrap_alert_type(type)} alert-dismissible flash" do %>
         <%= content_tag :strong, "#{type.titleize}: " %>
-        <%= "#{message}" %>
+        <%= message %>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
