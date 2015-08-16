@@ -32,7 +32,7 @@ class Feed < ActiveRecord::Base
           unless existing_episode_guids.include? item["guid"]
             self.episodes.create(
                 title: item["title"],
-                link: item["link"],
+                link: item["link"] || "",
                 description: format_desciption(item["description"]),
                 pubDate: item["pubDate"] || item["date"],
                 audio_url: item["enclosure"]["url"],
@@ -53,7 +53,8 @@ private
   # We don't need CDATA tags for our purposes.
   # This removes them so they don't muck up the works
   def clean_xml_for_use(xml)
-    xml.gsub(/(<![CDATA[|]]>)/ , "") 
+    xml.gsub(/(<![CDATA[|]]>)/ , "")
+       # .gsub(/&/, '&amp;')
   end
 
   def ensure_url_contains_a_podcast_feed
@@ -93,8 +94,6 @@ private
   def item_is_valid_episode(item)
     item.class == Hash \
       && item.key?("title") \
-      && item.key?("description") \
-      && item.key?("link") \
       && (item.key?("date") || item.key?("pubDate")) \
       && item.key?("guid") \
       && item.key?("enclosure") \
@@ -103,12 +102,13 @@ private
   end
   
   # Sometimes there are multiple description tags in an item. NO ONE KNOWS WHY.
+  # Sometimes there is no description tag at all.
   # We flatten and join them for use.
   def format_desciption(desc)
     if desc.class == Array
       return desc.flatten.join(" ")
     end
-    desc
+    desc || ''
   end
 end
 
