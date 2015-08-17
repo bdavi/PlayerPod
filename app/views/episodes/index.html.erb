@@ -31,12 +31,16 @@
         <%= content_tag :div, class: 'episode', data: {
           "episode-index" => index, "episode-audio-url" => episode.audio_url,
           "episode-id" => episode.id, "episode-audio-type" => episode.audio_type,
-          "episode-title" => episode.title } do %>
+          "episode-title" => episode.title, "episode-has-been-played" => "0" } do %>
 
           <%= content_tag :h3 do %>
             <%= image_tag 'appbarControlPlayOrange.svg', id: index, alt: 'Play/Pause' %>
             <%= episode.title %>
           <% end %>
+          <%= content_tag :div, class: "toggle-played" do %>
+            <%= image_tag 'appbar.checkmark.uncrossed.svg' %>
+            <%= content_tag :strong, "Played" %>
+          <% end %> 
           <%= content_tag :p, "Published #{episode.display_pub_date} on #{episode.feed.title}" %>
           <%= content_tag :p, sanitize_for_display(episode.description).html_safe %>
         <% end %>

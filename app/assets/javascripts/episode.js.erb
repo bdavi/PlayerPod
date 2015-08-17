@@ -5,6 +5,8 @@ var playImagePath = "<%= asset_path 'appbar.control.play.svg' %>";
 var pauseImagePath = "<%= asset_path 'appbar.control.pause.svg' %>";
 var smallPlayImagePath = "<%= asset_path 'appbarControlPlayOrange.svg' %>";
 var smallPauseImagePath = "<%= asset_path 'appbarControlPauseOrange.svg' %>";
+var unCheckedImagePath =  "<%= asset_path 'appbar.checkmark.uncrossed.svg' %>";
+var checkedImagePath = "<%= asset_path 'appbar.checkmark.thick.svg' %>";
 var currentEpisodeIndex = 0; // We're 0 indexed here everybody
 var isPlaying = false;
 var $audioTag; 
@@ -46,6 +48,7 @@ function togglePlaySelectedEpisode(event) {
   updateAll();
 }
 
+
 // *****************************************************************************
 // Helpers
 // *****************************************************************************
@@ -83,9 +86,18 @@ function updateAudioTag() {
   }
 }
 
+function updateEpisodePlayed() {
+  currentEpisode = new Episode(currentEpisodeIndex);
+  if (!currentEpisode.hasBeenPlayed) {
+    markEpisodeAsPlayedInDatabase(currentEpisode.episodeID);
+    currentEpisode.makeAsPlayedInGUI();
+  }
+}
+
 function updateAll() {
   updateDisplay();
   updateAudioTag();
+  updateEpisodePlayed();
 }
 
 function displayLoadingSpinner() {
@@ -96,6 +108,14 @@ function hideLoadingSpinner() {
   $('.show-when-processing').css('display', 'none');
 }
 
+function markEpisodeAsPlayedInDatabase(episode_id) {
+  $.ajax({
+    type:'POST',
+    url:'/episode_plays',
+    data: {episode_id: episode_id}
+  });
+}
+
 // *****************************************************************************
 // Episode Prototype 
 // *****************************************************************************
@@ -104,7 +124,13 @@ function Episode(index) {
   this.$episodeDiv = $('.episode[data-episode-index="' + index + '"]');
   this.audioUrl = this.$episodeDiv.attr("data-episode-audio-url");
   this.audioType = this.$episodeDiv.attr("data-episode-type");
-  this.title = this.$episodeDiv.attr("data-episode-title")
+  this.title = this.$episodeDiv.attr("data-episode-title");
+  this.episodeID = this.$episodeDiv.attr("data-episode-id");
+  this.hasBeenPlayed = (this.$episodeDiv.attr("data-episode-has-been-played") == "1");
+  this.makeAsPlayedInGUI = function() {
+    this.$episodeDiv.attr("data-episode-has-been-played", "1");
+    this.$episodeDiv.css("background-color", "#d1f5fc")
+  };
 }
 
 // *****************************************************************************
