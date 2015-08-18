@@ -17,20 +17,27 @@ var maxEpisodeIndex;
 // *****************************************************************************
 function togglePlayPause() {
   isPlaying = !isPlaying;
-  updateAll();
+  setEpisodePlayed(currentEpisodeIndex, true);
+  update();
 }
 
 function playNextEpisode() {
   if (currentEpisodeIndex < maxEpisodeIndex) {
     currentEpisodeIndex++;
-    updateAll();
+    if (isPlaying) {
+      setEpisodePlayed(currentEpisodeIndex, true);
+    }
+    update();
   }
 }
 
 function playPreviousEpisode() {
   if (currentEpisodeIndex > 0) {
     currentEpisodeIndex--;
-    updateAll();
+    if (isPlaying) {
+      setEpisodePlayed(currentEpisodeIndex, true);
+    }    
+    update();
   }
 }
 
@@ -41,13 +48,20 @@ function togglePlaySelectedEpisode(event) {
   if (newEpisodeIndex !== currentEpisodeIndex) {
     currentEpisodeIndex = newEpisodeIndex;
     isPlaying = true;
+    setEpisodePlayed(currentEpisodeIndex, true);
   }
   else { // or pause current track
     isPlaying = !isPlaying;
   }
-  updateAll();
+  update();
 }
 
+function toggleEpisodePlayed(event) {
+  var thisEpisodeIndex = $(event.target).closest('.episode').attr('data-episode-index')
+  var thisEpisode = new Episode(thisEpisodeIndex);
+  setEpisodePlayed(thisEpisodeIndex, !thisEpisode.hasBeenPlayed);
+  update();
+}
 
 // *****************************************************************************
 // Helpers
@@ -56,8 +70,10 @@ function updateDisplay() {
   currentEpisode = new Episode(currentEpisodeIndex);
   
   $(".current-track").html(currentEpisode.title);
-  $('.episode img[id]').attr("src", smallPlayImagePath);
-  
+  $(".episode img[id]").attr("src", smallPlayImagePath);
+  $(".toggle-played img").attr("src", unCheckedImagePath);
+  $('.episode[data-episode-has-been-played="1"] .toggle-played img').attr("src", checkedImagePath);
+
   if (isPlaying) {
     $(".play-pause-button img").attr("src", pauseImagePath);
     $('.episode img[id="' + currentEpisodeIndex + '"]').attr("src", smallPauseImagePath);
@@ -86,18 +102,24 @@ function updateAudioTag() {
   }
 }
 
-function updateEpisodePlayed() {
-  currentEpisode = new Episode(currentEpisodeIndex);
-  if (!currentEpisode.hasBeenPlayed) {
+function setEpisodePlayed(episodeIndex, markAsPlayed) {
+  currentEpisode = new Episode(episodeIndex);
+
+  if (!currentEpisode.hasBeenPlayed && markAsPlayed) {
+    currentEpisode.$episodeDiv.attr("data-episode-has-been-played", "1");
     markEpisodeAsPlayedInDatabase(currentEpisode.episodeID);
-    currentEpisode.makeAsPlayedInGUI();
+    return;
+  }
+
+  if (currentEpisode.hasBeenPlayed && !markAsPlayed) {
+    currentEpisode.$episodeDiv.attr("data-episode-has-been-played", "0");
+    markEpisodeAsNotPlayedInDatabase(currentEpisode.episodeID);
   }
 }
 
-function updateAll() {
+function update() {
   updateDisplay();
   updateAudioTag();
-  updateEpisodePlayed();
 }
 
 function displayLoadingSpinner() {
@@ -116,6 +138,14 @@ function markEpisodeAsPlayedInDatabase(episode_id) {
   });
 }
 
+function markEpisodeAsNotPlayedInDatabase(episode_id) {
+  $.ajax({
+    type:'DELETE',
+    url:'/unplay',
+    data: {episode_id: episode_id}
+  });
+}
+
 // *****************************************************************************
 // Episode Prototype 
 // *****************************************************************************
@@ -127,10 +157,6 @@ function Episode(index) {
   this.title = this.$episodeDiv.attr("data-episode-title");
   this.episodeID = this.$episodeDiv.attr("data-episode-id");
   this.hasBeenPlayed = (this.$episodeDiv.attr("data-episode-has-been-played") == "1");
-  this.makeAsPlayedInGUI = function() {
-    this.$episodeDiv.attr("data-episode-has-been-played", "1");
-    this.$episodeDiv.css("background-color", "#d1f5fc")
-  };
 }
 
 // *****************************************************************************
@@ -149,6 +175,7 @@ function initEventHandlers() {
   $("audio").bind("ended", playNextEpisode);
   $(".episode img[id]").click(togglePlaySelectedEpisode);
   $("audio").bind("canplay", hideLoadingSpinner);
+  $(".toggle-played").click(toggleEpisodePlayed);
 }
 
 function getMaxEpisodeIndex() {
