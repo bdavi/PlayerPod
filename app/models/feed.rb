@@ -50,11 +50,10 @@ class Feed < ActiveRecord::Base
 
 private
 
-  # We don't need CDATA tags for our purposes.
-  # This removes them so they don't muck up the works
+  # We need to remove CDATA tags and sanitize the contents before parsing
   def clean_xml_for_use(xml)
-    xml.gsub(/(<![CDATA[|]]>)/ , "")
-       # .gsub(/&/, '&amp;')
+    pattern = /(?<cdata>\<\!\[CDATA\[(?<interior>[^(<!CDATA)])*\]\]\>)/
+    return xml.gsub(pattern) { ActionView::Base.full_sanitizer.sanitize($2) }
   end
 
   def ensure_url_contains_a_podcast_feed
@@ -87,6 +86,10 @@ private
           && feed_hash["rss"]["channel"].key?("description") \
           && valid_items.any?
     rescue Exception => e
+      logger.debug "======================================="
+      logger.debug e.message
+      logger.debug "======================================="
+
       false
     end
   end
