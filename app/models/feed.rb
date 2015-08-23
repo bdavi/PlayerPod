@@ -2,65 +2,72 @@ require 'uri'
 require 'net/http'
 
 class Feed < ActiveRecord::Base
+  attr_accessor :downloaded_feed_xml
+
   has_many :subscriptions, dependent: :destroy
   has_many :episodes, dependent: :destroy
-  before_validation :ensure_url_contains_a_podcast_feed, before: :create
-  after_create :update_from_server
+  before_validation :ensure_url_contains_a_podcast_feed, before: :create, unless: "Rails.env.test?"
+  after_create :update_from_server, unless: "Rails.env.test?"
 
   def update_from_server
     begin
-      # Get and hash the feed info
-      feed_xml = get_content_from_url #Will error if invalid URL or network problems
-      cleand_xml = clean_xml_for_use(feed_xml)
-      feed_hash = Hash.from_xml(cleand_xml) #Will error if not valid XML
-      channel_data = feed_hash["rss"]["channel"]
-      valid_episodes_from_xml = channel_data["item"].select {|item| item_is_valid_episode(item)}
-
-      ActiveRecord::Base.transaction do
-        # Update feed
-        self.title = channel_data["title"] || ""
-        self.description = format_desciption(channel_data["description"]) || ""
-        self.save
-
-        # Clear old episodes
-        episode_guids_to_keep = channel_data["item"].map {|item| item["guid"]}
-        self.episodes.where.not(guid: episode_guids_to_keep).destroy_all
-
-        # Create new episodes
-        existing_episode_guids = self.episodes.map {|e| e.guid}
-        valid_episodes_from_xml.each do |item|
-          unless existing_episode_guids.include? item["guid"]
-            self.episodes.create(
-                title: item["title"],
-                link: item["link"] || "",
-                description: format_desciption(item["description"]),
-                pubDate: item["pubDate"] || item["date"],
-                audio_url: item["enclosure"]["url"],
-                audio_type: item["enclosure"]["type"],
-                guid: item["guid"]
-            )
-          end
-        end
-      end
+      get_content_from_url
+      parse_xml_from_server
       true
     rescue
       false
     end
   end
 
-private
+  # Can throw errors, be sure to catch them when calling
+  def parse_xml_from_server
+    # Get and hash the feed info
+    cleand_xml = clean_xml_for_use(@downloaded_feed_xml)
+    feed_hash = Hash.from_xml(cleand_xml) #Will error if not valid XML
+    channel_data = feed_hash["rss"]["channel"]
+    valid_episodes_from_xml = channel_data["item"].select {|item| item_is_valid_episode(item)}
 
+    ActiveRecord::Base.transaction do
+      # Update feed
+      self.title = channel_data["title"] || ""
+      self.description = format_desciption(channel_data["description"]) || ""
+      self.save
+
+      # Clear old episodes
+      episode_guids_to_keep = channel_data["item"].map {|item| item["guid"]}
+      self.episodes.where.not(guid: episode_guids_to_keep).destroy_all
+
+      # Create new episodes
+      existing_episode_guids = self.episodes.map {|e| e.guid}
+      valid_episodes_from_xml.each do |item|
+        unless existing_episode_guids.include? item["guid"]
+          self.episodes.create(
+              title: item["title"],
+              link: item["link"] || "",
+              description: format_desciption(item["description"]),
+              pubDate: item["pubDate"] || item["date"],
+              audio_url: item["enclosure"]["url"],
+              audio_type: item["enclosure"]["type"],
+              guid: item["guid"]
+          )
+        end
+      end
+    end
+    true
+  end
+
+private
   # We need to remove CDATA tags and sanitize the contents before parsing
   def clean_xml_for_use(xml)
     pattern = /(?<cdata>\<\!\[CDATA\[(?<interior>[^(<!CDATA)])*\]\]\>)/
-    return xml.gsub(pattern) { ActionView::Base.full_sanitizer.sanitize($2) }
+    xml.gsub(pattern) { ActionView::Base.full_sanitizer.sanitize($2) }
   end
 
   def ensure_url_contains_a_podcast_feed
     begin
       # Get and hash the feed info
-      feed_xml = get_content_from_url # Will error if bad url or network issues
-      cleand_xml = clean_xml_for_use(feed_xml)
+      get_content_from_url # Will error if bad url or network issues
+      cleand_xml = clean_xml_for_use(@downloaded_feed_xml)
       feed_hash = Hash.from_xml(cleand_xml) #Will error if not valid XML
       raise "Not well formed feed" unless feed_hash_is_well_formed(feed_hash)
       true
@@ -71,10 +78,11 @@ private
   end
 
   # Downloads feed xml 
+  # Can throw errors, be sure to catch them when calling  
   def get_content_from_url
     uri = URI(feed_url)
     response = Net::HTTP.get_response(uri)
-    response.body
+    @downloaded_feed_xml = response.body
   end
 
   # Checks hash to ensure it has all the elements we will need to parse this as a podcast feed.
@@ -86,9 +94,9 @@ private
           && feed_hash["rss"]["channel"].key?("description") \
           && valid_items.any?
     rescue Exception => e
-      logger.debug "======================================="
+      logger.debug "=" * 80
       logger.debug e.message
-      logger.debug "======================================="
+      logger.debug "=" * 80
 
       false
     end
@@ -111,7 +119,7 @@ private
     if desc.class == Array
       return desc.flatten.join(" ")
     end
-    desc || ''
+    desc.strip! || desc || ''
   end
 end
 
