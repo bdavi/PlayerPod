@@ -59,3 +59,6 @@ gem 'pundit'
 
 # Use figaro to handle sensitive info
 gem 'figaro', '1.0'
+
+# Use factory_girl
+gem 'factory_girl_rails'
