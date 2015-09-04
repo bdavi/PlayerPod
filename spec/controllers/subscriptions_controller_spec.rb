@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe SubscriptionsController, type: :controller do
+RSpec.describe SubscriptionsController do
 
   describe "GET #create" do
     it "creates a new subscription for the current user" do
@@ -23,15 +23,14 @@ RSpec.describe SubscriptionsController, type: :controller do
     end
   end
 
-  # describe "DELETE #destroy" do
-  #   it "deletes the users subscription" do
-  #     user = FactoryGirl.create(:user_with_subscription)
-  #     $stdout.puts ("=" * 20) + user.subscriptions.count + "\n"
-
-  #     delete :destroy, {id: user.subscriptions.first.id}
-  #     expect(user.subscriptions.count).to eq(0)
-  #   end
-  # end
+  describe "DELETE #destroy" do
+    it "deletes the users subscription" do
+      user = create(:user, :with_subscription)
+      sign_in user
+      delete :destroy, {id: user.subscriptions.first.id}
+      expect(user.subscriptions.count).to eq(0)
+    end
+  end
 
   describe "GET #index" do
     it "returns http success if user is signed in" do
@@ -45,5 +44,4 @@ RSpec.describe SubscriptionsController, type: :controller do
       expect {get :index }.to raise_error(NoMethodError)
     end
   end
-
 end

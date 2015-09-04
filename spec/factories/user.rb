@@ -1,13 +1,14 @@
 FactoryGirl.define do 
   factory :user do
-    email "test@test.com"
-    password "passwordhere!!"
+    email { Faker::Internet.email }
+    password { Faker::Internet.password }
 
-    factory :user_with_subscription do |user|
-      after(:create) do 
-        feed = FactoryGirl.create(:feed)
-        FactoryGirl.create(:subscription, user: user, feed: feed)
+    trait :with_subscription do
+      after(:create) do |user|
+        feed = create(:feed)
+        create(:subscription, user: user, feed: feed)
       end
     end
   end
 end
+

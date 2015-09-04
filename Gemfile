@@ -62,3 +62,6 @@ gem 'figaro', '1.0'
 
 # Use factory_girl
 gem 'factory_girl_rails'
+
+# Use faker
+gem 'faker'

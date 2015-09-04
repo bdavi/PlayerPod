@@ -3,7 +3,6 @@ class EpisodePlaysController < ApplicationController
     raise Pundit::NotAuthorizedError unless current_user
 
     EpisodePlay.create(user_id: current_user.id, episode_id: params[:episode_id])
-
   end
 
   def destroy_by_episode_and_user

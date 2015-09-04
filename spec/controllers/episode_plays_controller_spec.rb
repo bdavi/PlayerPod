@@ -1,12 +1,17 @@
 require 'rails_helper'
 
-RSpec.describe EpisodePlaysController, type: :controller do
+describe EpisodePlaysController do
 
   describe "GET #create" do
-    it "returns http success" do
-      get :create
-      expect(response).to have_http_status(:success)
+    it "raises NoMethodError if no user present" do
+      expect {get :create}.to raise_error(NoMethodError)
     end
+
+    it "raises NoMethodError if no user present" do
+      expect {get :create}.to raise_error(NoMethodError)
+    end
+
+
   end
 
   describe "GET #destroy" do
