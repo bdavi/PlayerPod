@@ -2,6 +2,8 @@ require 'uri'
 require 'net/http'
 
 class Feed < ActiveRecord::Base
+  REDIRECT_LIMIT = 3
+
   attr_accessor :downloaded_feed_xml
 
   has_many :subscriptions, dependent: :destroy
@@ -72,17 +74,37 @@ private
       raise "Not well formed feed" unless feed_hash_is_well_formed(feed_hash)
       true
     rescue Exception => e
+      logger.debug "=" * 80
+      logger.debug e.message
+      logger.debug "=" * 80
+
       errors.add :feed_url, "This URL doesn't contain a valid podcast feed."
       return false 
     end
   end
 
   # Downloads feed xml 
+  # Will follow redirects and update feed_url with correct location
   # Can throw errors, be sure to catch them when calling  
-  def get_content_from_url
+  def get_content_from_url(redirect_count = nil)
+    # Handle redirection recursion
+    if redirect_count.nil?
+      redirect_count = 0
+    elsif redirect_count >= REDIRECT_LIMIT
+      raise "Too many redirects"
+    else
+      redirect_count += 1
+    end
+
     uri = URI(feed_url)
     response = Net::HTTP.get_response(uri)
-    @downloaded_feed_xml = response.body
+
+    if response.kind_of?(Net::HTTPRedirection)
+      self.feed_url = response['location']
+      get_content_from_url redirect_count
+    else
+      @downloaded_feed_xml = response.body.force_encoding('UTF-8')
+    end
   end
 
   # Checks hash to ensure it has all the elements we will need to parse this as a podcast feed.
@@ -111,12 +133,14 @@ private
       && item["enclosure"].key?("url") \
       && item["enclosure"].key?("type")
   end
-  
+
   # Sometimes there are multiple description tags in an item. NO ONE KNOWS WHY.
   # Sometimes there is no description tag at all.
   # We flatten and join them for use.
   def format_desciption(desc)
-    if desc.class == Array
+    if desc.nil?
+      return ''
+    elsif desc.class == Array
       return desc.flatten.join(" ")
     end
     desc.strip! || desc || ''
