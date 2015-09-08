@@ -5,6 +5,9 @@ PlayerPod is a responsive online podcast player built on Ruby on Rails, JavaScri
 
 Unlike many podcast players, PlayerPod threads all your podcasts together and hides already played episodes.
 
+![PlayerPod episode screen screenshot](Readme_Screenshot.png?raw=true "PlayerPod episode screen")
+
+
 ## Demo
 The current demo version is available on Heroku at: 
 [https://radiant-ocean-9425.herokuapp.com/](https://radiant-ocean-9425.herokuapp.com/)
