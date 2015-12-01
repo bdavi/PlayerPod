@@ -74,10 +74,6 @@ private
       raise "Not well formed feed" unless feed_hash_is_well_formed(feed_hash)
       true
     rescue Exception => e
-      logger.debug "=" * 80
-      logger.debug e.message
-      logger.debug "=" * 80
-
       errors.add :feed_url, "This URL doesn't contain a valid podcast feed."
       return false 
     end
@@ -86,25 +82,20 @@ private
   # Downloads feed xml 
   # Will follow redirects and update feed_url with correct location
   # Can throw errors, be sure to catch them when calling  
-  def get_content_from_url(redirect_count = nil)
-    # Handle redirection recursion
-    if redirect_count.nil?
-      redirect_count = 0
-    elsif redirect_count >= REDIRECT_LIMIT
-      raise "Too many redirects"
-    else
-      redirect_count += 1
-    end
+  def get_content_from_url
+    1.upto(REDIRECT_LIMIT) do 
+      uri = URI(feed_url)
+      response = Net::HTTP.get_response(uri)
 
-    uri = URI(feed_url)
-    response = Net::HTTP.get_response(uri)
-
-    if response.kind_of?(Net::HTTPRedirection)
-      self.feed_url = response['location']
-      get_content_from_url redirect_count
-    else
-      @downloaded_feed_xml = response.body.force_encoding('UTF-8')
+      if response.kind_of?(Net::HTTPRedirection)
+        self.feed_url = response['location']
+      else
+        @downloaded_feed_xml = response.body.force_encoding('UTF-8')
+        return
+      end
     end
+    
+    raise "Too many redirects" # We hit our redireciton limit
   end
 
   # Checks hash to ensure it has all the elements we will need to parse this as a podcast feed.
@@ -116,10 +107,6 @@ private
           && feed_hash["rss"]["channel"].key?("description") \
           && valid_items.any?
     rescue Exception => e
-      logger.debug "=" * 80
-      logger.debug e.message
-      logger.debug "=" * 80
-
       false
     end
   end
